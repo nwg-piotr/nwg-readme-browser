@@ -21,6 +21,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 
 from gi.repository import Gtk, Gdk, WebKit2
+from docutils.core import publish_string
 
 webview = None
 search_entry = None
@@ -156,7 +157,7 @@ def on_child_activated(fb, child):
     package_name = child.get_name()
     # file_path = f"/usr/share/doc/{package_name}/README.md"
     file_path = readme_path(package_name)
-    load_markdown_file(file_path)
+    load_readme_file(file_path)
 
 
 class SearchEntry(Gtk.SearchEntry):
@@ -201,18 +202,32 @@ class FileMenu(Gtk.ScrolledWindow):
         self.flowbox.set_filter_func(filter_func, text)
 
 
-def load_markdown_file(file_path):
+def load_readme_file(file_path):
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            markdown_content = file.read()
-            render_markdown(markdown_content)
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as file:
+            content = file.read()
+            if file_path.endswith(".rst"):
+                render_rst(content)
+            elif file_path.endswith(".html"):
+                render_html(content)
+            else:
+                render_markdown(content)
     except FileNotFoundError:
         print(f"Error: File not found - {file_path}")
 
 
-def render_markdown(markdown_content, md=True):
+def render_markdown(markdown_content):
     html_content = f"<html><body>{md2html(markdown_content)}</body></html>"
     webview.load_html(html_content, 'file:///')
+
+
+def render_rst(content):
+    html_content = publish_string(source=content, writer_name='html').decode('utf-8')
+    webview.load_html(html_content, 'file:///')
+
+
+def render_html(content):
+    webview.load_html(content, 'file:///')
 
 
 def readme_path(name):
@@ -223,6 +238,8 @@ def readme_path(name):
             return f"/usr/share/doc/{name}/README"
         elif os.path.isfile(f"/usr/share/doc/{name}/README.rst"):
             return f"/usr/share/doc/{name}/README.rst"
+        elif os.path.isfile(f"/usr/share/doc/{name}/README.html"):
+            return f"/usr/share/doc/{name}/README.html"
 
     return ""
 
@@ -278,7 +295,7 @@ def main():
 
     if len(readme_package_names) > 0:
         file_path = readme_path(readme_package_names[0])
-        load_markdown_file(file_path)
+        load_readme_file(file_path)
 
     win.connect("destroy", Gtk.main_quit)
     win.connect("key-release-event", handle_keyboard)
