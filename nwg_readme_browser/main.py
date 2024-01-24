@@ -55,8 +55,16 @@ def save_json(src_dict, path):
 
 # load config, create if it doesn't yet exist
 config = load_json(config_file)
-DEFAULTS = {"doc-dir": "/usr/share/doc",
-            "packages": ["nwg-shell", "nwg-shell-config", "nwg-hello", "nwg-icon-browser"]}  # t.b.c.
+DEFAULTS = {
+    "doc-dir": "/usr/share/doc",
+    "packages": [
+        "nwg-readme-browser",
+        "nwg-shell",
+        "nwg-shell-config",
+        "nwg-hello",
+        "nwg-icon-browser"
+    ]
+}  # t.b.c.
 for key in DEFAULTS:
     if key not in config:
         config[key] = DEFAULTS[key]
