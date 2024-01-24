@@ -8,6 +8,7 @@ Project: https://github.com/nwg-piotr/nwg-shell
 Repository: https://github.com/nwg-piotr/nwg-readme-browser
 License: MIT
 """
+import json
 import os.path
 
 import markdown2 as markdown
@@ -24,6 +25,43 @@ from gi.repository import Gtk, Gdk, WebKit2
 PACKAGES = sorted(os.listdir("/usr/share/doc"))
 webview = None
 search_entry = None
+config = None
+
+xdg_config_home = os.getenv('XDG_CONFIG_HOME')
+config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
+config_dir = os.path.join(config_home, "nwg-icon-browser")
+config_file = os.path.join(config_dir, "config.json")
+if not os.path.isdir(config_dir):
+    os.makedirs(config_dir, exist_ok=True)
+
+
+def load_json(path):
+    try:
+        with open(path, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        print("Error loading json: {}".format(e))
+        return {}
+
+
+def save_json(src_dict, path):
+    try:
+        with open(path, 'w') as f:
+            json.dump(src_dict, f, indent=2)
+        return "ok"
+    except Exception as e:
+        return e
+
+
+# load config, create if it doesn't yet exist
+config = load_json(config_file)
+DEFAULTS = {"doc-dir": "/usr/share/doc",
+            "packages": ["nwg-shell", "nwg-shell-config", "nwg-hello", "nwg-icon-browser"]}  # t.b.c.
+for key in DEFAULTS:
+    if key not in config:
+        config[key] = DEFAULTS[key]
+if not os.path.isfile(config_file):
+    save_json(config, config_file)
 
 
 def md2html(markdown_text):
@@ -186,7 +224,7 @@ def main():
     win.add(hbox)
 
     # Left column
-    col_left = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=6)
+    col_left = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
     hbox.pack_start(col_left, False, False, 0)
 
     # navigation buttons
