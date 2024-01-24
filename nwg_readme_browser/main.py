@@ -8,6 +8,7 @@ Project: https://github.com/nwg-piotr/nwg-shell
 Repository: https://github.com/nwg-piotr/nwg-readme-browser
 License: MIT
 """
+import argparse
 import json
 import os.path
 
@@ -21,11 +22,14 @@ gi.require_version('WebKit2', '4.0')
 
 from gi.repository import Gtk, Gdk, WebKit2
 
-# PACKAGES = ['nwg-shell-config', 'lv2', 'audit']
-PACKAGES = sorted(os.listdir("/usr/share/doc"))
 webview = None
 search_entry = None
 config = None
+
+try:
+    from .__about__ import __version__
+except ImportError:
+    __version__ = "unknown"
 
 xdg_config_home = os.getenv('XDG_CONFIG_HOME')
 config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
@@ -150,7 +154,8 @@ class FlowboxItem(Gtk.Box):
 def on_child_activated(fb, child):
     # on flowbox item clicked
     package_name = child.get_name()
-    file_path = f"/usr/share/doc/{package_name}/README.md"
+    # file_path = f"/usr/share/doc/{package_name}/README.md"
+    file_path = readme_path(package_name)
     load_markdown_file(file_path)
 
 
@@ -205,23 +210,37 @@ def load_markdown_file(file_path):
         print(f"Error: File not found - {file_path}")
 
 
-def render_markdown(markdown_content):
+def render_markdown(markdown_content, md=True):
     html_content = f"<html><body>{md2html(markdown_content)}</body></html>"
     webview.load_html(html_content, 'file:///')
 
 
 def readme_path(name):
     if isinstance(name, str) and name:
-        return f"/usr/share/doc/{name}/README.md"
+        if os.path.isfile(f"/usr/share/doc/{name}/README.md"):
+            return f"/usr/share/doc/{name}/README.md"
+        elif os.path.isfile(f"/usr/share/doc/{name}/README"):
+            return f"/usr/share/doc/{name}/README"
+        elif os.path.isfile(f"/usr/share/doc/{name}/README.rst"):
+            return f"/usr/share/doc/{name}/README.rst"
 
     return ""
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--version", action="version",
+                        version=f"%(prog)s version {__version__}")
+    parser.add_argument("-c", "--config", action="store_true",
+                        help="list only packages defined in Config file")
+    args = parser.parse_args()
+
+    packages = config["packages"] if args.config else sorted(os.listdir("/usr/share/doc"))
+
     # find README.md files that actually exist
     readme_package_names = []
-    for name in PACKAGES:
-        if os.path.isfile(readme_path(name)):
+    for name in packages:
+        if readme_path(name):
             readme_package_names.append(name)
 
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
@@ -257,8 +276,9 @@ def main():
     # Right column
     hbox.pack_start(scrolled, True, True, 6)
 
-    file_path = readme_path(readme_package_names[0])
-    load_markdown_file(file_path)
+    if len(readme_package_names) > 0:
+        file_path = readme_path(readme_package_names[0])
+        load_markdown_file(file_path)
 
     win.connect("destroy", Gtk.main_quit)
     win.connect("key-release-event", handle_keyboard)
