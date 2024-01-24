@@ -33,7 +33,10 @@ def md2html(markdown_text):
 
 def handle_keyboard(win, event):
     if event.type == Gdk.EventType.KEY_RELEASE and event.keyval == Gdk.KEY_Escape:
-        win.destroy()
+        if search_entry.get_text():
+            search_entry.set_text("")
+        else:
+            win.destroy()
 
 
 def on_forward_btn(*args):
