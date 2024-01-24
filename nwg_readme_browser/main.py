@@ -30,9 +30,9 @@ config = None
 xdg_config_home = os.getenv('XDG_CONFIG_HOME')
 config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
 config_dir = os.path.join(config_home, "nwg-icon-browser")
-config_file = os.path.join(config_dir, "config.json")
 if not os.path.isdir(config_dir):
     os.makedirs(config_dir, exist_ok=True)
+config_file = os.path.join(config_dir, "config.json")
 
 
 def load_json(path):
