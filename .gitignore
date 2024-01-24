@@ -1,0 +1,5 @@
+/.idea
+/venv
+/nwg_readme_browser.egg-info/
+/build/
+/dist/
