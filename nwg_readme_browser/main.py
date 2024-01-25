@@ -323,7 +323,10 @@ def main():
     col_right.pack_end(status_label, False, False, 6)
 
     if len(readme_package_names) > 0:
-        file_path = readme_path(readme_package_names[0])
+        if "nwg-readme-browser" in readme_package_names:
+            file_path = readme_path("nwg-readme-browser")
+        else:
+            file_path = readme_path(readme_package_names[0])
         if load_readme_file(file_path):
             status_label.set_text(file_path)
 
