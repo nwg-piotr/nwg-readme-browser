@@ -75,11 +75,13 @@ DEFAULTS = {
         "nwg-icon-browser"
     ]
 }  # t.b.c.
+key_missing = False
 for key in DEFAULTS:
     if key not in config:
         config[key] = DEFAULTS[key]
-# we only create config file, if not found/preinstalled
-if not os.path.isfile(config_file):
+        key_missing = True
+# we only create config file, if not found/preinstalled; we also need to save it if some key is missing
+if not os.path.isfile(config_file) or key_missing:
     save_json(config, config_file)
 
 last_file_path = home_path = f"{DEFAULTS['doc-dir']}/nwg-readme-browser/README.md"
