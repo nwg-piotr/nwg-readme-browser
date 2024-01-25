@@ -6,7 +6,8 @@ Nwg-readme-browser was conceived as [rtfm](https://en.wikipedia.org/wiki/RTFM) w
 It searches the `/usr/share/doc` path for `README.*` files, and displays them in WebKit2.WebView. 
 It supports `.md`, `.rst`, `.html` and plain text. It <u>does not support .pdf</u> format. 
 
-<a href="https://github.com/nwg-piotr/nwg-readme-browser/assets/20579136/084e05aa-5273-41c4-9fbd-c1d8450d11c7"><img src="https://github.com/nwg-piotr/nwg-readme-browser/assets/20579136/084e05aa-5273-41c4-9fbd-c1d8450d11c7" width=640></a>
+<a href="https://github.com/nwg-piotr/nwg-readme-browser/assets/20579136/56d94b95-d765-4e1a-9489-26e1ac4f9a19"><img src="https://github.com/nwg-piotr/nwg-readme-browser/assets/20579136/56d94b95-d765-4e1a-9489-26e1ac4f9a19" width=640></a>
+
 
 Instead of all README.* files, the program may only display those that belong to packages enumerated in the config file, 
 or the internally defined set (nwg-shell-related).
