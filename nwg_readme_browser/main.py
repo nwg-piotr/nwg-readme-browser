@@ -86,7 +86,6 @@ if not os.path.isfile(config_file) or key_missing:
     save_json(config, config_file)
 
 last_file_path = home_path = f"{DEFAULTS['doc-dir']}/nwg-readme-browser/README.md"
-last_package_name = "nwg-readme-browser"
 
 
 def md2html(markdown_text):
@@ -104,6 +103,7 @@ def handle_keyboard(win, event):
 
 def on_home_btn(*args):
     load_readme_file(home_path)
+    update_status_label()
 
 
 def on_forward_btn(*args):
@@ -258,6 +258,7 @@ class FileMenu(Gtk.ScrolledWindow):
 
 
 def load_readme_file(file_path):
+    global last_file_path
     try:
         with open(file_path, "r", encoding="utf-8", errors="ignore") as file:
             content = file.read()
@@ -267,6 +268,8 @@ def load_readme_file(file_path):
                 render_html(content)
             else:
                 render_markdown(content)
+            last_file_path = file_path
+            # last_package_name = package_name
             return True
     except FileNotFoundError:
         print(f"Error: File not found - {file_path}")
@@ -318,7 +321,8 @@ def readme_path(name):
 
 
 def update_status_label():
-    status_label.set_markup(f"<b>{last_package_name}:</b> {last_file_path}")
+    parts = last_file_path.split("/")
+    status_label.set_markup(f'<tt>{"/".join(parts[:-2])}/</tt><b>{parts[-2]}</b><tt>/{parts[-1]}</tt>')
 
 
 def main():
@@ -360,12 +364,12 @@ def main():
 
     # horizontal wrapper
     hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, spacing=0)
-    hbox.set_property("margin", 6)
+    hbox.set_property("margin", 0)
     vwrapper.pack_start(hbox, False, False, 0)
 
     # Left column
     col_left = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
-    hbox.pack_start(col_left, False, False, 0)
+    hbox.pack_start(col_left, False, False, 6)
 
     # navigation buttons
     btn_bar = ButtonBar()
