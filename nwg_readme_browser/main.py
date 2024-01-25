@@ -7,7 +7,7 @@ e-mail: nwg.piotr@gmail.com
 Project: https://github.com/nwg-piotr/nwg-shell
 Repository: https://github.com/nwg-piotr/nwg-readme-browser
 License: MIT
-Dependencies: python-docutils
+Dependencies: python-markdown2, python-docutils, webkit2gtk
 Supported formats: .md, .rst, html, plain text
 Unsupported formats: .pdf
 """
@@ -36,6 +36,7 @@ try:
 except ImportError:
     __version__ = "unknown"
 
+# Config file & dictionary
 xdg_config_home = os.getenv('XDG_CONFIG_HOME')
 config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
 config_dir = os.path.join(config_home, "nwg-readme-browser")
@@ -94,7 +95,7 @@ DEFAULTS = {
         "swayimg",
         "nwg-shell-wallpapers"
     ]
-}  # t.b.c.
+}
 key_missing = False
 for key in DEFAULTS:
     if key not in config:
@@ -107,11 +108,13 @@ if not os.path.isfile(config_file) or key_missing:
 last_file_path = home_path = f"{DEFAULTS['doc-dir']}/nwg-readme-browser/README.md"
 
 
+# Convert markdown to html
 def md2html(markdown_text):
     html_content = markdown.markdown(markdown_text, extras=['fenced-code-blocks'])
     return html_content
 
 
+# GUI controls
 def handle_keyboard(win, event):
     if event.type == Gdk.EventType.KEY_RELEASE and event.keyval == Gdk.KEY_Escape:
         if search_entry.get_text():
@@ -161,6 +164,7 @@ def on_button_release(btn, event):
         on_back_btn()
 
 
+# Toolbar
 class ButtonBar(Gtk.Box):
     def __init__(self):
         Gtk.Box.__init__(self)
@@ -197,7 +201,7 @@ class ButtonBar(Gtk.Box):
 
 
 def on_enter_notify_event(widget, event):
-    # highlight item
+    # highlight pointed item
     widget.set_state_flags(Gtk.StateFlags.DROP_ACTIVE, clear=False)
     widget.set_state_flags(Gtk.StateFlags.SELECTED, clear=False)
 
@@ -208,6 +212,7 @@ def on_leave_notify_event(widget, event):
     widget.unset_state_flags(Gtk.StateFlags.SELECTED)
 
 
+# Side menu
 class FlowboxItem(Gtk.Box):
     def __init__(self, package_name):
         Gtk.EventBox.__init__(self, orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
@@ -233,15 +238,6 @@ def on_child_activated(fb, child):
 
     if load_readme_file(file_path):
         update_status_label()
-
-
-class SearchEntry(Gtk.SearchEntry):
-    def __init_(self):
-        Gtk.SearchEntry.__init__(self)
-        self.set_icon_from_icon_name(Gtk.EntryIconPosition.SECONDARY, "edit-clear-symbolic")
-        self.set_property("hexpand", True)
-        self.set_property("margin", 12)
-        self.set_size_request(700, 0)
 
 
 class FileMenu(Gtk.ScrolledWindow):
@@ -276,6 +272,17 @@ class FileMenu(Gtk.ScrolledWindow):
         self.flowbox.set_filter_func(filter_func, text)
 
 
+# Search entry
+class SearchEntry(Gtk.SearchEntry):
+    def __init_(self):
+        Gtk.SearchEntry.__init__(self)
+        self.set_icon_from_icon_name(Gtk.EntryIconPosition.SECONDARY, "edit-clear-symbolic")
+        self.set_property("hexpand", True)
+        self.set_property("margin", 12)
+        self.set_size_request(700, 0)
+
+
+# Load and render picked file
 def load_readme_file(file_path):
     global last_file_path
     try:
@@ -288,8 +295,8 @@ def load_readme_file(file_path):
             else:
                 render_markdown(content)
             last_file_path = file_path
-            # last_package_name = package_name
             return True
+
     except FileNotFoundError:
         print(f"Error: File not found - {file_path}")
         return False
@@ -309,6 +316,7 @@ def render_html(content):
     webview.load_html(content, 'file:///')
 
 
+# Supported file names & extensions supported in this precedence
 def readme_path(name):
     if isinstance(name, str) and name:
         if os.path.isfile(f"/usr/share/doc/{name}/README.md"):
@@ -339,6 +347,7 @@ def readme_path(name):
     return ""
 
 
+# Status label formatting shows the file path in monospaced text, except for the package name, which is bold
 def update_status_label():
     parts = last_file_path.split("/")
     status_label.set_markup(f'<tt>{"/".join(parts[:-2])}/</tt><b>{parts[-2]}</b><tt>/{parts[-1]}</tt>')
@@ -362,26 +371,30 @@ def main():
         # packages defined in the program DEFAULTS dictionary
         packages = DEFAULTS["packages"]
     elif args.config:
-        # packages defined in the config file
+        # packages defined in the config file; it may be the same as DEFAULTS,
+        # unless preinstalled by the packager or modified by the user
         packages = config["packages"]
     else:
         # all packages found in DEFAULTS["doc-dir"] ('/usr/share/doc' by default)
         folders = os.listdir("/usr/share/doc")
+        # sort case-insensitive
         packages = sorted(folders, key=str.casefold)
 
-    # find README.md files that actually exist
+    # verify which README.md files actually exist
     readme_package_names = []
     for name in packages:
         if readme_path(name):
             readme_package_names.append(name)
 
+    # Program window
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
     win.set_title("nwg README")
+
     # main vertical wrapper
     vwrapper = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
     win.add(vwrapper)
 
-    # horizontal wrapper
+    # horizontal wrapper inside main
     hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, spacing=0)
     hbox.set_property("margin", 0)
     vwrapper.pack_start(hbox, True, True, 0)
@@ -413,7 +426,7 @@ def main():
     lbl.set_markup(f"<b>nwg-readme-browser</b> v{__version__}")
     footer_box.pack_start(lbl, False, False, 6)
 
-    # Right column
+    # Right column: file preview
     global webview
     webview = WebKit2.WebView()
     webview.connect("button-release-event", on_button_release)
