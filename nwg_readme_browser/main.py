@@ -116,7 +116,7 @@ def on_back_btn(*args):
         webview.go_back()
     else:
         if load_readme_file(last_file_path):
-            status_label.set_markup(f"<b>{last_package_name}:</b> {last_file_path}")
+            status_label.set_markup(f"<small><b>{last_package_name}:</b> {last_file_path}</small>")
 
 
 def on_zoom_btn(btn, action=""):
@@ -213,7 +213,7 @@ def on_child_activated(fb, child):
     last_package_name = package_name
 
     if load_readme_file(file_path):
-        status_label.set_markup(f"<b>{last_package_name}:</b> {last_file_path}")
+        status_label.set_markup(f"<small><b>{last_package_name}:</b> {last_file_path}</small>")
 
 
 class SearchEntry(Gtk.SearchEntry):
@@ -367,11 +367,21 @@ def main():
     search_entry = SearchEntry()
     col_left.pack_start(search_entry, False, False, 6)
 
-    # package names list
+    # package names list (Gtk.FlowBox in Gtk.ScrolledWindow)
     file_menu = FileMenu(readme_package_names)
     search_entry.connect('search_changed', file_menu.flowbox_filter)
     col_left.pack_start(file_menu, False, False, 6)
 
+    # footer
+    box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
+    col_left.pack_start(box, False, False, 0)
+    img = Gtk.Image.new_from_icon_name("nwg-readme-browser", Gtk.IconSize.DND)
+    box.pack_start(img, False, False, 0)
+    lbl = Gtk.Label()
+    lbl.set_markup(f"<b>nwg-readme-browser</b> v{__version__}")
+    box.pack_start(lbl, False, False, 6)
+
+    # Right column
     global webview
     webview = WebKit2.WebView()
     webview.connect("button-release-event", on_button_release)
@@ -379,7 +389,6 @@ def main():
     scrolled.add(webview)
     webview.set_zoom_level(config["default-zoom"])
 
-    # Right column
     col_right = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
     hbox.pack_start(col_right, True, True, 6)
     col_right.pack_start(scrolled, True, True, 6)
@@ -394,7 +403,7 @@ def main():
         else:
             file_path = readme_path(readme_package_names[0])
         if load_readme_file(file_path):
-            status_label.set_markup(f"<b>{last_package_name}:</b> {last_file_path}")
+            status_label.set_markup(f"<small><b>{last_package_name}:</b> {last_file_path}</small>")
 
     win.connect("destroy", Gtk.main_quit)
     win.connect("key-release-event", handle_keyboard)
@@ -405,9 +414,7 @@ def main():
     style_context = Gtk.StyleContext()
     style_context.add_provider_for_screen(screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
-    css = b""" 
-        button { padding: 0 }
-        """
+    css = b"""button { padding: 0 }"""
     provider.load_from_data(css)
 
     win.show_all()
