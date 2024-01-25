@@ -115,6 +115,22 @@ def on_back_btn(*args):
             status_label.set_text(last_file_path)
 
 
+def on_zoom_btn(btn, action=""):
+    level = webview.get_zoom_level()
+    if action == "in":
+        if level < 2.0:
+            webview.set_zoom_level(level + 0.1)
+        else:
+            webview.set_zoom_level(2.0)
+    elif action == "original":
+        webview.set_zoom_level(1.0)
+    elif action == "out":
+        if level > 0.2:
+            webview.set_zoom_level(level - 0.1)
+        else:
+            webview.set_zoom_level(0.1)
+
+
 def on_button_release(btn, event):
     if event.button == 9:
         on_forward_btn()
@@ -138,6 +154,18 @@ class ButtonBar(Gtk.Box):
 
         btn = Gtk.Button.new_from_icon_name("go-next", Gtk.IconSize.MENU)
         btn.connect("clicked", on_forward_btn)
+        self.pack_start(btn, False, False, 0)
+
+        btn = Gtk.Button.new_from_icon_name("zoom-out", Gtk.IconSize.MENU)
+        btn.connect("clicked", on_zoom_btn, "out")
+        self.pack_start(btn, False, False, 0)
+
+        btn = Gtk.Button.new_from_icon_name("zoom-original", Gtk.IconSize.MENU)
+        btn.connect("clicked", on_zoom_btn, "original")
+        self.pack_start(btn, False, False, 0)
+
+        btn = Gtk.Button.new_from_icon_name("zoom-in", Gtk.IconSize.MENU)
+        btn.connect("clicked", on_zoom_btn, "in")
         self.pack_start(btn, False, False, 0)
 
         btn = Gtk.Button.new_from_icon_name("application-exit", Gtk.IconSize.MENU)
@@ -364,6 +392,18 @@ def main():
 
     win.connect("destroy", Gtk.main_quit)
     win.connect("key-release-event", handle_keyboard)
+
+    # customize styling
+    screen = Gdk.Screen.get_default()
+    provider = Gtk.CssProvider()
+    style_context = Gtk.StyleContext()
+    style_context.add_provider_for_screen(screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+    css = b""" 
+        button { padding: 0 }
+        """
+    provider.load_from_data(css)
+
     win.show_all()
 
     search_entry.grab_focus()
