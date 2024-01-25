@@ -116,7 +116,7 @@ def on_back_btn(*args):
         webview.go_back()
     else:
         if load_readme_file(last_file_path):
-            status_label.set_markup(f"<small><b>{last_package_name}:</b> {last_file_path}</small>")
+            update_status_label()
 
 
 def on_zoom_btn(btn, action=""):
@@ -213,7 +213,7 @@ def on_child_activated(fb, child):
     last_package_name = package_name
 
     if load_readme_file(file_path):
-        status_label.set_markup(f"<small><b>{last_package_name}:</b> {last_file_path}</small>")
+        update_status_label()
 
 
 class SearchEntry(Gtk.SearchEntry):
@@ -317,6 +317,10 @@ def readme_path(name):
     return ""
 
 
+def update_status_label():
+    status_label.set_markup(f"<b>{last_package_name}:</b> {last_file_path}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--version", action="version",
@@ -350,10 +354,14 @@ def main():
 
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
     win.set_title("nwg README")
-    # main wrapper
+    # main vertical wrapper
+    vwrapper = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
+    win.add(vwrapper)
+
+    # horizontal wrapper
     hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, spacing=0)
     hbox.set_property("margin", 6)
-    win.add(hbox)
+    vwrapper.pack_start(hbox, False, False, 0)
 
     # Left column
     col_left = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
@@ -373,13 +381,14 @@ def main():
     col_left.pack_start(file_menu, False, False, 6)
 
     # footer
-    box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
-    col_left.pack_start(box, False, False, 0)
+    footer_box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
+    vwrapper.pack_end(footer_box, False, False, 0)
+    # col_left.pack_start(box, False, False, 0)
     img = Gtk.Image.new_from_icon_name("nwg-readme-browser", Gtk.IconSize.DND)
-    box.pack_start(img, False, False, 0)
+    footer_box.pack_start(img, False, False, 0)
     lbl = Gtk.Label()
     lbl.set_markup(f"<b>nwg-readme-browser</b> v{__version__}")
-    box.pack_start(lbl, False, False, 6)
+    footer_box.pack_start(lbl, False, False, 6)
 
     # Right column
     global webview
@@ -395,7 +404,7 @@ def main():
 
     global status_label
     status_label = Gtk.Label()
-    col_right.pack_end(status_label, False, False, 6)
+    footer_box.pack_end(status_label, True, True, 6)
 
     if len(readme_package_names) > 0:
         if "nwg-readme-browser" in readme_package_names:
@@ -403,7 +412,7 @@ def main():
         else:
             file_path = readme_path(readme_package_names[0])
         if load_readme_file(file_path):
-            status_label.set_markup(f"<small><b>{last_package_name}:</b> {last_file_path}</small>")
+            update_status_label()
 
     win.connect("destroy", Gtk.main_quit)
     win.connect("key-release-event", handle_keyboard)
