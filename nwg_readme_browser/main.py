@@ -386,8 +386,8 @@ def main():
 
     # footer
     footer_box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
+    footer_box.set_property("margin", 6)
     vwrapper.pack_end(footer_box, False, False, 0)
-    # col_left.pack_start(box, False, False, 0)
     img = Gtk.Image.new_from_icon_name("nwg-readme-browser", Gtk.IconSize.DND)
     footer_box.pack_start(img, False, False, 0)
     lbl = Gtk.Label()
