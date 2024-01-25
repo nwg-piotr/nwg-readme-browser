@@ -19,7 +19,7 @@ options:
   -h, --help      show this help message and exit
   -v, --version   show program's version number and exit
   -i, --internal  only list Internally defined packages (nwg-shell components)
-  -c, --config    only list packages enumerated in the `/home/piotr/.config/nwg-icon-
+  -c, --config    only list packages enumerated in the `~/.config/nwg-icon-
                   browser/config.json` file
 ```
 
