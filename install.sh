@@ -2,6 +2,7 @@
 
 python3 setup.py install --optimize=1
 
+# 'coreutils' package required
 install -Dm 644 -t "/usr/share/pixmaps" nwg-readme-browser.svg
 install -Dm 644 -t "/usr/share/applications" nwg-readme-browser.desktop
 install -Dm 644 -t "/usr/share/licenses/nwg-readme-browser" LICENSE
