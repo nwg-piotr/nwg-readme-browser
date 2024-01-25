@@ -30,7 +30,6 @@ webview = None
 search_entry = None
 status_label = None
 config = None
-last_file_path = ""
 
 try:
     from .__about__ import __version__
@@ -82,6 +81,8 @@ for key in DEFAULTS:
 # we only create config file, if not found/preinstalled
 if not os.path.isfile(config_file):
     save_json(config, config_file)
+
+last_file_path = f"{DEFAULTS['doc-dir']}/nwg-readme-browser/README.md"
 
 
 def md2html(markdown_text):
