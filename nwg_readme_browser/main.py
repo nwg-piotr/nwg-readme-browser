@@ -82,7 +82,7 @@ for key in DEFAULTS:
 if not os.path.isfile(config_file):
     save_json(config, config_file)
 
-last_file_path = f"{DEFAULTS['doc-dir']}/nwg-readme-browser/README.md"
+last_file_path = home_path = f"{DEFAULTS['doc-dir']}/nwg-readme-browser/README.md"
 
 
 def md2html(markdown_text):
@@ -96,6 +96,10 @@ def handle_keyboard(win, event):
             search_entry.set_text("")
         else:
             win.destroy()
+
+
+def on_home_btn(*args):
+    load_readme_file(home_path)
 
 
 def on_forward_btn(*args):
@@ -122,10 +126,10 @@ class ButtonBar(Gtk.Box):
     def __init__(self):
         Gtk.Box.__init__(self)
         self.set_orientation(Gtk.Orientation.HORIZONTAL)
-        self.set_spacing(6)
+        self.set_spacing(3)
 
-        btn = Gtk.Button.new_from_icon_name("application-exit", Gtk.IconSize.MENU)
-        btn.connect("clicked", Gtk.main_quit)
+        btn = Gtk.Button.new_from_icon_name("go-home", Gtk.IconSize.MENU)
+        btn.connect("clicked", on_home_btn)
         self.pack_start(btn, False, False, 0)
 
         btn = Gtk.Button.new_from_icon_name("go-previous", Gtk.IconSize.MENU)
@@ -134,6 +138,10 @@ class ButtonBar(Gtk.Box):
 
         btn = Gtk.Button.new_from_icon_name("go-next", Gtk.IconSize.MENU)
         btn.connect("clicked", on_forward_btn)
+        self.pack_start(btn, False, False, 0)
+
+        btn = Gtk.Button.new_from_icon_name("application-exit", Gtk.IconSize.MENU)
+        btn.connect("clicked", Gtk.main_quit)
         self.pack_start(btn, False, False, 0)
 
 
