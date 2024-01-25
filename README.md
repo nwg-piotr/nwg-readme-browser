@@ -7,8 +7,8 @@ It supports .md, .rst, .html and plain text. It does not support .pdf format.
 
 <a href="https://github.com/nwg-piotr/nwg-readme-browser/assets/20579136/084e05aa-5273-41c4-9fbd-c1d8450d11c7"><img src="https://github.com/nwg-piotr/nwg-readme-browser/assets/20579136/084e05aa-5273-41c4-9fbd-c1d8450d11c7" width=640></a>
 
-Instead of all, it may only display the README.* files associated to packages enumerated in the config file, or the
-internally defined set (nwg-shell-related).
+Instead of all README.* files, the program may only display those associated to packages enumerated in the config file, 
+or the internally defined set (nwg-shell-related).
 
 ```text
 $ nwg-readme-browser -h
