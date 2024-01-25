@@ -384,7 +384,7 @@ def main():
     # horizontal wrapper
     hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, spacing=0)
     hbox.set_property("margin", 0)
-    vwrapper.pack_start(hbox, False, False, 0)
+    vwrapper.pack_start(hbox, True, True, 0)
 
     # Left column
     col_left = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
