@@ -234,12 +234,28 @@ def readme_path(name):
     if isinstance(name, str) and name:
         if os.path.isfile(f"/usr/share/doc/{name}/README.md"):
             return f"/usr/share/doc/{name}/README.md"
-        elif os.path.isfile(f"/usr/share/doc/{name}/README"):
-            return f"/usr/share/doc/{name}/README"
+        if os.path.isfile(f"/usr/share/doc/{name}/readme.md"):
+            return f"/usr/share/doc/{name}/readme.md"
+
         elif os.path.isfile(f"/usr/share/doc/{name}/README.rst"):
             return f"/usr/share/doc/{name}/README.rst"
+        elif os.path.isfile(f"/usr/share/doc/{name}/readme.rst"):
+            return f"/usr/share/doc/{name}/readme.rst"
+
         elif os.path.isfile(f"/usr/share/doc/{name}/README.html"):
             return f"/usr/share/doc/{name}/README.html"
+        elif os.path.isfile(f"/usr/share/doc/{name}/readme.html"):
+            return f"/usr/share/doc/{name}/readme.html"
+
+        elif os.path.isfile(f"/usr/share/doc/{name}/README.txt"):
+            return f"/usr/share/doc/{name}/README.txt"
+        elif os.path.isfile(f"/usr/share/doc/{name}/readme.txt"):
+            return f"/usr/share/doc/{name}/readme.txt"
+
+        elif os.path.isfile(f"/usr/share/doc/{name}/README"):
+            return f"/usr/share/doc/{name}/README"
+        elif os.path.isfile(f"/usr/share/doc/{name}/readme"):
+            return f"/usr/share/doc/{name}/readme"
 
     return ""
 
