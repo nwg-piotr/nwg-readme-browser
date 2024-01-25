@@ -7,6 +7,9 @@ e-mail: nwg.piotr@gmail.com
 Project: https://github.com/nwg-piotr/nwg-shell
 Repository: https://github.com/nwg-piotr/nwg-readme-browser
 License: MIT
+Dependencies: python-docutils
+Supported formats: .md, .rst, html, plain text
+Unsupported formats: .pdf
 """
 import argparse
 import json
@@ -247,15 +250,15 @@ def readme_path(name):
         elif os.path.isfile(f"/usr/share/doc/{name}/readme.html"):
             return f"/usr/share/doc/{name}/readme.html"
 
-        elif os.path.isfile(f"/usr/share/doc/{name}/README.txt"):
-            return f"/usr/share/doc/{name}/README.txt"
-        elif os.path.isfile(f"/usr/share/doc/{name}/readme.txt"):
-            return f"/usr/share/doc/{name}/readme.txt"
-
         elif os.path.isfile(f"/usr/share/doc/{name}/README"):
             return f"/usr/share/doc/{name}/README"
         elif os.path.isfile(f"/usr/share/doc/{name}/readme"):
             return f"/usr/share/doc/{name}/readme"
+
+        elif os.path.isfile(f"/usr/share/doc/{name}/README.txt"):
+            return f"/usr/share/doc/{name}/README.txt"
+        elif os.path.isfile(f"/usr/share/doc/{name}/readme.txt"):
+            return f"/usr/share/doc/{name}/readme.txt"
 
     return ""
 
@@ -268,7 +271,8 @@ def main():
                         help="list only packages defined in Config file")
     args = parser.parse_args()
 
-    packages = config["packages"] if args.config else sorted(os.listdir("/usr/share/doc"))
+    folders = os.listdir("/usr/share/doc")
+    packages = config["packages"] if args.config else sorted(folders, key=str.casefold)
 
     # find README.md files that actually exist
     readme_package_names = []
