@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+
+Name=README file browser
+Name[pl]=Przeglądarka plików README
+
+GenericName=nwg-shell README file browser
+GenericName[pl]=Przeglądarka plików README nwg-shell
+
+Comment=README file search and viewing tool
+Comment[pl]=Narzędzie do wyszukiwania i przeglądania plików README
+
+Exec=nwg-readme-browser
+Icon=nwg-readme-browser
+Terminal=false
+Categories=Utility;

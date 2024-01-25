@@ -28,6 +28,7 @@ from docutils.core import publish_string
 
 webview = None
 search_entry = None
+status_label = None
 config = None
 
 try:
@@ -160,7 +161,8 @@ def on_child_activated(fb, child):
     package_name = child.get_name()
     # file_path = f"/usr/share/doc/{package_name}/README.md"
     file_path = readme_path(package_name)
-    load_readme_file(file_path)
+    if load_readme_file(file_path):
+        status_label.set_text(file_path)
 
 
 class SearchEntry(Gtk.SearchEntry):
@@ -170,7 +172,6 @@ class SearchEntry(Gtk.SearchEntry):
         self.set_property("hexpand", True)
         self.set_property("margin", 12)
         self.set_size_request(700, 0)
-        # self.connect('search_changed', flowbox_filter)
 
 
 class FileMenu(Gtk.ScrolledWindow):
@@ -215,8 +216,10 @@ def load_readme_file(file_path):
                 render_html(content)
             else:
                 render_markdown(content)
+            return True
     except FileNotFoundError:
         print(f"Error: File not found - {file_path}")
+        return False
 
 
 def render_markdown(markdown_content):
@@ -311,11 +314,18 @@ def main():
     scrolled.add(webview)
 
     # Right column
-    hbox.pack_start(scrolled, True, True, 6)
+    col_right = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
+    hbox.pack_start(col_right, True, True, 6)
+    col_right.pack_start(scrolled, True, True, 6)
+
+    global status_label
+    status_label = Gtk.Label()
+    col_right.pack_end(status_label, False, False, 6)
 
     if len(readme_package_names) > 0:
         file_path = readme_path(readme_package_names[0])
-        load_readme_file(file_path)
+        if load_readme_file(file_path):
+            status_label.set_text(file_path)
 
     win.connect("destroy", Gtk.main_quit)
     win.connect("key-release-event", handle_keyboard)
