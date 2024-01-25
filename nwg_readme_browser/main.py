@@ -67,6 +67,7 @@ def save_json(src_dict, path):
 config = load_json(config_file)
 DEFAULTS = {
     "doc-dir": "/usr/share/doc",
+    "default-zoom": 1.0,
     "packages": [
         "nwg-readme-browser",
         "nwg-shell",
@@ -376,6 +377,7 @@ def main():
     webview.connect("button-release-event", on_button_release)
     scrolled = Gtk.ScrolledWindow()
     scrolled.add(webview)
+    webview.set_zoom_level(config["default-zoom"])
 
     # Right column
     col_right = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
