@@ -1,5 +1,7 @@
 # nwg-readme-browser
 
+This program is a part of the [nwg-shell](https://nwg-piotr.github.io/nwg-shell) project.
+
 This program searches the `/usr/share/doc` path for `README.*` files and creates their preview in WebKit2.WebView. 
 It supports .md, .rst, .html and plain text. It does not support .pdf format. 
 
