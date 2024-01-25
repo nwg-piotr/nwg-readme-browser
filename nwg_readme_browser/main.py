@@ -40,6 +40,7 @@ except ImportError:
 xdg_config_home = os.getenv('XDG_CONFIG_HOME')
 config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
 config_dir = os.path.join(config_home, "nwg-icon-browser")
+# create config directory if not found
 if not os.path.isdir(config_dir):
     os.makedirs(config_dir, exist_ok=True)
 config_file = os.path.join(config_dir, "config.json")
@@ -78,6 +79,7 @@ DEFAULTS = {
 for key in DEFAULTS:
     if key not in config:
         config[key] = DEFAULTS[key]
+# we only create config file, if not found/preinstalled
 if not os.path.isfile(config_file):
     save_json(config, config_file)
 
@@ -277,12 +279,26 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--version", action="version",
                         version=f"%(prog)s version {__version__}")
+
+    parser.add_argument("-i", "--internal", action="store_true",
+                        help="only list Internally defined packages (nwg-shell components)")
+
     parser.add_argument("-c", "--config", action="store_true",
-                        help="list only packages defined in Config file")
+                        help=f"only list packages enumerated in the `{config_file}` file")
+
     args = parser.parse_args()
 
-    folders = os.listdir("/usr/share/doc")
-    packages = config["packages"] if args.config else sorted(folders, key=str.casefold)
+    # Which packages to list
+    if args.internal:
+        # packages defined in the program DEFAULTS dictionary
+        packages = DEFAULTS["packages"]
+    elif args.config:
+        # packages defined in the config file
+        packages = config["packages"]
+    else:
+        # all packages found in DEFAULTS["doc-dir"] ('/usr/share/doc' by default)
+        folders = os.listdir("/usr/share/doc")
+        packages = sorted(folders, key=str.casefold)
 
     # find README.md files that actually exist
     readme_package_names = []
