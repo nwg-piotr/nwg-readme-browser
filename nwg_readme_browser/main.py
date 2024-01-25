@@ -69,11 +69,30 @@ DEFAULTS = {
     "doc-dir": "/usr/share/doc",
     "default-zoom": 1.0,
     "packages": [
-        "nwg-readme-browser",
         "nwg-shell",
         "nwg-shell-config",
+        "nwg-panel",
+        "nwg-drawer",
+        "nwg-dock",
+        "nwg-dock-hyprland",
+        "nwg-menu",
+        "nwg-look",
+        "nwg-displays",
+        "azote",
+        "nwg-bar",
+        "nwg-clipman",
+        "nwg-icon-picker",
+        "nwg-readme-browser",
+        "autotiling",
+        "gopsuinfo",
         "nwg-hello",
-        "nwg-icon-browser"
+        "sddm-sugar-candy-nwg",
+        "swaync",
+        "gtklock",
+        "swaylock",
+        "swayidle",
+        "swayimg",
+        "nwg-shell-wallpapers"
     ]
 }  # t.b.c.
 key_missing = False
@@ -399,6 +418,7 @@ def main():
     webview = WebKit2.WebView()
     webview.connect("button-release-event", on_button_release)
     scrolled = Gtk.ScrolledWindow()
+    scrolled.set_propagate_natural_height(True)
     scrolled.add(webview)
     webview.set_zoom_level(config["default-zoom"])
 
