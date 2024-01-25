@@ -23,6 +23,10 @@ options:
                   browser/config.json` file
 ```
 
+## Installation
+
+Clone the [repository](https://github.com/nwg-piotr/nwg-readme-browser) and run the `install.sh` script.
+
 ## Configuration
 
 The config file is placed in `$XDG_CONFIG_HOME/.config/nwg-readme-browser/config.json`. By default, it looks as below:
