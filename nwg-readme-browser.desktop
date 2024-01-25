@@ -2,7 +2,7 @@
 Type=Application
 
 Name=README file browser
-Name[pl]=Przeglądarka plików README
+Name[pl]=Przeglądarka README
 
 GenericName=nwg-shell README file browser
 GenericName[pl]=Przeglądarka plików README nwg-shell
