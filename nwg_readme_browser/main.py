@@ -30,6 +30,7 @@ webview = None
 search_entry = None
 status_label = None
 config = None
+last_file_path = ""
 
 try:
     from .__about__ import __version__
@@ -102,6 +103,9 @@ def on_forward_btn(*args):
 def on_back_btn(*args):
     if webview.can_go_back():
         webview.go_back()
+    else:
+        if load_readme_file(last_file_path):
+            status_label.set_text(last_file_path)
 
 
 def on_button_release(btn, event):
@@ -159,8 +163,11 @@ class FlowboxItem(Gtk.Box):
 def on_child_activated(fb, child):
     # on flowbox item clicked
     package_name = child.get_name()
-    # file_path = f"/usr/share/doc/{package_name}/README.md"
+    webview.load_uri("about:blank")  # clear history
     file_path = readme_path(package_name)
+    global last_file_path
+    last_file_path = file_path
+
     if load_readme_file(file_path):
         status_label.set_text(file_path)
 
