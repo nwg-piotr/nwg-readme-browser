@@ -83,6 +83,7 @@ if not os.path.isfile(config_file):
     save_json(config, config_file)
 
 last_file_path = home_path = f"{DEFAULTS['doc-dir']}/nwg-readme-browser/README.md"
+last_package_name = "nwg-readme-browser"
 
 
 def md2html(markdown_text):
@@ -112,7 +113,7 @@ def on_back_btn(*args):
         webview.go_back()
     else:
         if load_readme_file(last_file_path):
-            status_label.set_text(last_file_path)
+            status_label.set_markup(f"<b>{last_package_name}:</b> {last_file_path}")
 
 
 def on_zoom_btn(btn, action=""):
@@ -204,11 +205,12 @@ def on_child_activated(fb, child):
     package_name = child.get_name()
     webview.load_uri("about:blank")  # clear history
     file_path = readme_path(package_name)
-    global last_file_path
+    global last_file_path, last_package_name
     last_file_path = file_path
+    last_package_name = package_name
 
     if load_readme_file(file_path):
-        status_label.set_text(file_path)
+        status_label.set_markup(f"<b>{last_package_name}:</b> {last_file_path}")
 
 
 class SearchEntry(Gtk.SearchEntry):
@@ -227,7 +229,7 @@ class FileMenu(Gtk.ScrolledWindow):
         self.set_propagate_natural_height(True)
 
         self.flowbox = Gtk.FlowBox()
-        # flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
         self.flowbox.connect("child-activated", on_child_activated)
         self.flowbox.set_valign(Gtk.Align.START)
         self.flowbox.set_max_children_per_line(1)
@@ -388,7 +390,7 @@ def main():
         else:
             file_path = readme_path(readme_package_names[0])
         if load_readme_file(file_path):
-            status_label.set_text(file_path)
+            status_label.set_markup(f"<b>{last_package_name}:</b> {last_file_path}")
 
     win.connect("destroy", Gtk.main_quit)
     win.connect("key-release-event", handle_keyboard)
