@@ -29,7 +29,8 @@ Clone the [repository](https://github.com/nwg-piotr/nwg-readme-browser) and run 
 
 ## Configuration
 
-The config file is placed in `$XDG_CONFIG_HOME/.config/nwg-readme-browser/config.json`. By default, it looks as below:
+The config file is placed in `~/.config/nwg-readme-browser/config.json` (unless you set the `$XDG_CONFIG_HOME` variable
+a different way). By default, it looks as below:
 
 ```json
 {
