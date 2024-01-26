@@ -30,6 +30,7 @@ webview = None
 search_entry = None
 status_label = None
 config = None
+readme_package_names = []
 
 try:
     from .__about__ import __version__
@@ -105,13 +106,34 @@ for key in DEFAULTS:
 if not os.path.isfile(config_file) or key_missing:
     save_json(config, config_file)
 
-last_file_path = home_path = f"{DEFAULTS['doc-dir']}/nwg-readme-browser/README.md"
+last_file_path = home_path = ""
 
 
 # Convert markdown to html
 def md2html(markdown_text):
     html_content = markdown.markdown(markdown_text, extras=['fenced-code-blocks'])
     return html_content
+
+
+# which README to download as start page
+def home_file():
+    file_path = ""
+    if len(readme_package_names) > 0:
+        if "nwg-shell" in readme_package_names:
+            file_path = readme_path("nwg-shell")
+        elif "nwg-readme-browser" in readme_package_names:
+            file_path = readme_path("nwg-readme-browser")
+        else:
+            file_path = readme_path(readme_package_names[0])
+
+    return file_path
+
+
+def go_home(*args):
+    home = home_file()
+    if home:
+        if load_readme_file(home):
+            update_status_label()
 
 
 # GUI controls
@@ -125,11 +147,6 @@ def handle_keyboard(win, event):
 
 
 # on toolbar buttons
-def on_home_btn(*args):
-    load_readme_file(home_path)
-    update_status_label()
-
-
 def on_forward_btn(*args):
     if webview.can_go_forward():
         webview.go_forward()
@@ -175,7 +192,7 @@ class ButtonBar(Gtk.Box):
         self.set_spacing(3)
 
         btn = Gtk.Button.new_from_icon_name("go-home", Gtk.IconSize.MENU)
-        btn.connect("clicked", on_home_btn)
+        btn.connect("clicked", go_home)
         self.pack_start(btn, False, False, 0)
 
         btn = Gtk.Button.new_from_icon_name("go-previous", Gtk.IconSize.MENU)
@@ -369,6 +386,9 @@ def main():
 
     args = parser.parse_args()
 
+    global last_file_path, home_path
+    last_file_path = home_path = home_file()
+
     # Which packages to list
     if args.internal:
         # packages defined in the program DEFAULTS dictionary
@@ -384,6 +404,7 @@ def main():
         packages = sorted(folders, key=str.casefold)
 
     # verify which README.md files actually exist
+    global readme_package_names
     readme_package_names = []
     for name in packages:
         if readme_path(name):
@@ -448,18 +469,6 @@ def main():
     status_label = Gtk.Label()
     footer_box.pack_end(status_label, True, True, 6)
 
-    # which README to download on startup
-    if len(readme_package_names) > 0:
-        if "nwg-shell" in readme_package_names:
-            file_path = readme_path("nwg-shell")
-        elif "nwg-readme-browser" in readme_package_names:
-            file_path = readme_path("nwg-readme-browser")
-        else:
-            file_path = readme_path(readme_package_names[0])
-
-        if load_readme_file(file_path):
-            update_status_label()
-
     win.connect("destroy", Gtk.main_quit)
     win.connect("key-release-event", handle_keyboard)
 
@@ -471,6 +480,9 @@ def main():
 
     css = b"""button { padding: 0 }"""
     provider.load_from_data(css)
+
+    # open start page
+    go_home()
 
     win.show_all()
 
