@@ -9,9 +9,15 @@ with nwg-shell for sway and Hyprland in mind, is little, if at all, tested on fl
 
 <a href="https://github.com/nwg-piotr/nwg-readme-browser/assets/20579136/56d94b95-d765-4e1a-9489-26e1ac4f9a19"><img src="https://github.com/nwg-piotr/nwg-readme-browser/assets/20579136/56d94b95-d765-4e1a-9489-26e1ac4f9a19" width=640></a>
 
+## Usage
+
+Use the side menu to select the README file to preview. Basic navigation is provided by the toolbar above. 
+Below there is a search entry that allows you to filter the file list.
+
+### Arguments
 
 Instead of all README.* files, the program may only display those that belong to packages enumerated in the config file, 
-or the internally defined set (nwg-shell-related).
+or the internally defined set (nwg-shell-related). Use a command line argument for this.
 
 ```text
 $ nwg-readme-browser -h
