@@ -23,7 +23,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 
-from gi.repository import Gtk, Gdk, WebKit2
+from gi.repository import Gtk, Gdk, GLib, WebKit2
 from docutils.core import publish_string
 
 webview = None
@@ -374,6 +374,8 @@ def update_status_label():
 
 
 def main():
+    GLib.set_prgname('nwg-readme-browser')
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--version", action="version",
                         version=f"%(prog)s version {__version__}")

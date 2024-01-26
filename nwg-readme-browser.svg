@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="48"
-   height="48"
+   width="16"
+   height="16"
    version="1"
    id="svg6"
    sodipodi:docname="nwg-readme-browser.svg"
@@ -21,41 +21,41 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="4.9166667"
-     inkscape:cx="24.101695"
-     inkscape:cy="23.898305"
+     inkscape:zoom="38.030983"
+     inkscape:cx="9.452819"
+     inkscape:cy="8.2432789"
      inkscape:window-width="1912"
      inkscape:window-height="1012"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg6"
-     showgrid="false" />
-  <path
-     style="opacity:0.2"
-     d="M 10,5 C 8.892,5 8,5.892 8,7 v 36 c 0,1.108 0.892,2 2,2 h 28 c 1.108,0 2,-0.892 2,-2 V 17 L 29,16 28,5 Z"
-     id="path1" />
+     showgrid="false"
+     showguides="true">
+    <sodipodi:guide
+       position="-2.6031407,15"
+       orientation="0,1"
+       id="guide1"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,134,229)" />
+  </sodipodi:namedview>
   <path
      fill="#e4e4e4"
-     d="m10 4c-1.108 0-2 0.892-2 2v36c0 1.108 0.892 2 2 2h28c1.108 0 2-0.892 2-2v-26l-11-1-1-11z"
+     d="M 3.0926455,1 C 2.7048456,1 2.3926456,1.3122 2.3926456,1.6999999 V 14.3 c 0,0.387799 0.3122,0.7 0.6999999,0.7 h 9.7999985 c 0.387801,0 0.700001,-0.312202 0.700001,-0.7 V 5.1999996 l -3.8499999,-0.35 L 9.3926446,1 Z"
      id="path2"
-     style="fill:#00aad4;fill-opacity:1" />
+     style="fill:#00aad4;fill-opacity:1;stroke-width:0.35" />
   <path
-     fill="#fff"
-     opacity=".2"
-     d="m10 4c-1.108 0-2 0.892-2 2v1c0-1.108 0.892-2 2-2h18l11 11h1l-12-12z"
-     id="path3" />
-  <path
-     style="opacity:0.2"
-     d="m 28,5 v 10 c 0,1.1046 0.89543,2 2,2 h 10 z"
+     style="opacity:0.2;stroke-width:0.35"
+     d="m 9.3926446,1.3499999 v 3.4999997 c 0,0.3866099 0.3134009,0.6999999 0.7000004,0.6999999 h 3.5 z"
      id="path4" />
   <path
      fill="#fafafa"
-     d="m28 4v10c0 1.1046 0.89543 2 2 2h10l-12-12z"
+     d="m 9.3926446,1 v 3.4999996 c 0,0.38661 0.3134009,0.7 0.7000004,0.7 h 3.5 z"
      id="path5"
-     style="fill:#6ae3ff;fill-opacity:1" />
+     style="fill:#6ae3ff;fill-opacity:1;stroke-width:0.35" />
   <path
-     style="fill:#eeeeee;fill-opacity:1"
-     d="m 22,20 v 13 h 3 V 20 Z m 0,16 v 3 h 3 v -3 z"
+     style="fill:#eeeeee;fill-opacity:1;stroke-width:0.35"
+     d="M 7.2926453,6.5999994 V 11.15 H 8.3426449 V 6.5999994 Z m 0,5.6000006 v 1.05 H 8.3426449 V 12.2 Z"
      id="path6" />
 </svg>
