@@ -3,7 +3,7 @@
 
 This program is a part of the [nwg-shell](https://nwg-piotr.github.io/nwg-shell) project.
 
-Nwg-readme-browser was conceived as [rtfm](https://en.wikipedia.org/wiki/RTFM) with a graphical user interface. 
+**Nwg-readme-browser** was conceived as [rtfm](https://en.wikipedia.org/wiki/RTFM) with a graphical user interface. 
 It searches the `/usr/share/doc` path for `README.*` files, and displays them in WebKit2.WebView. 
 It supports `.md`, `.rst`, `.html` and plain text. It does not support `.pdf` format. Although the program was written 
 with nwg-shell for [sway](https://github.com/swaywm/sway) and [Hyprland](https://github.com/hyprwm/Hyprland) in mind, it may also be used standalone.
