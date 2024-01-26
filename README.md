@@ -1,4 +1,6 @@
-# nwg-readme-browser
+
+<img src="https://github.com/nwg-piotr/nwg-readme-browser/assets/20579136/86472817-73cd-4a1b-95cd-47d02acec446" width="90" style="margin-right:10px" align=left alt="nwg-shell logo">
+<H1>nwg-readme-browser</H1><br>
 
 This program is a part of the [nwg-shell](https://nwg-piotr.github.io/nwg-shell) project.
 
