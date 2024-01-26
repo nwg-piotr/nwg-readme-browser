@@ -124,7 +124,7 @@ def handle_keyboard(win, event):
             win.destroy()
 
 
-# toolbar buttons
+# on toolbar buttons
 def on_home_btn(*args):
     load_readme_file(home_path)
     update_status_label()
