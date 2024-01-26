@@ -12,8 +12,8 @@ with nwg-shell for [sway](https://github.com/swaywm/sway) and [Hyprland](https:/
 
 ## Usage
 
-Use the side menu to select the README file to preview. Basic navigation is provided by the toolbar above. 
-Below there is a search entry that allows you to filter the file list.
+Use the side menu to select the README file to preview. Basic navigation is provided by toolbar at the top of the side 
+bar. Below it there is a search entry that allows you to filter the file list.
 
 ### Arguments
 
