@@ -414,7 +414,7 @@ def main():
 
     # Program window
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
-    win.set_title("nwg README")
+    win.set_title("nwg README browser")
     # floating window dimensions (expected to fit in HD resolution screen)
     win.set_default_size(1200, 680)
 
