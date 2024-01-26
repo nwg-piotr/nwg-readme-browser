@@ -115,6 +115,7 @@ def md2html(markdown_text):
 
 
 # GUI controls
+# on Esc clear search entry if not empty, else terminate
 def handle_keyboard(win, event):
     if event.type == Gdk.EventType.KEY_RELEASE and event.keyval == Gdk.KEY_Escape:
         if search_entry.get_text():
@@ -123,6 +124,7 @@ def handle_keyboard(win, event):
             win.destroy()
 
 
+# toolbar buttons
 def on_home_btn(*args):
     load_readme_file(home_path)
     update_status_label()
@@ -157,6 +159,7 @@ def on_zoom_btn(btn, action=""):
             webview.set_zoom_level(0.1)
 
 
+# go back / forward on mouse side buttons
 def on_button_release(btn, event):
     if event.button == 9:
         on_forward_btn()
@@ -389,19 +392,21 @@ def main():
     # Program window
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
     win.set_title("nwg README")
+    # floating window dimensions (expected to fit in HD resolution screen)
+    win.set_default_size(1200, 680)
 
     # main vertical wrapper
-    vwrapper = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
-    win.add(vwrapper)
+    v_wrapper = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
+    win.add(v_wrapper)
 
     # horizontal wrapper inside main
-    hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, spacing=0)
-    hbox.set_property("margin", 0)
-    vwrapper.pack_start(hbox, True, True, 0)
+    h_box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, spacing=0)
+    h_box.set_property("margin", 0)
+    v_wrapper.pack_start(h_box, True, True, 0)
 
     # Left column
     col_left = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
-    hbox.pack_start(col_left, False, False, 6)
+    h_box.pack_start(col_left, False, False, 6)
 
     # navigation buttons
     btn_bar = ButtonBar()
@@ -419,7 +424,7 @@ def main():
     # footer
     footer_box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
     footer_box.set_property("margin", 6)
-    vwrapper.pack_end(footer_box, False, False, 0)
+    v_wrapper.pack_end(footer_box, False, False, 0)
     img = Gtk.Image.new_from_icon_name("nwg-readme-browser", Gtk.IconSize.DND)
     footer_box.pack_start(img, False, False, 0)
     lbl = Gtk.Label()
@@ -436,18 +441,22 @@ def main():
     webview.set_zoom_level(config["default-zoom"])
 
     col_right = Gtk.Box.new(Gtk.Orientation.VERTICAL, spacing=0)
-    hbox.pack_start(col_right, True, True, 6)
+    h_box.pack_start(col_right, True, True, 6)
     col_right.pack_start(scrolled, True, True, 6)
 
     global status_label
     status_label = Gtk.Label()
     footer_box.pack_end(status_label, True, True, 6)
 
+    # which README to download on startup
     if len(readme_package_names) > 0:
-        if "nwg-readme-browser" in readme_package_names:
+        if "nwg-shell" in readme_package_names:
+            file_path = readme_path("nwg-shell")
+        elif "nwg-readme-browser" in readme_package_names:
             file_path = readme_path("nwg-readme-browser")
         else:
             file_path = readme_path(readme_package_names[0])
+
         if load_readme_file(file_path):
             update_status_label()
 
