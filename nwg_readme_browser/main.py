@@ -400,7 +400,7 @@ def main():
     # Which packages to list
     if args.internal:
         # packages defined in the program DEFAULTS dictionary
-        packages = DEFAULTS["packages"]
+        packages = sorted(DEFAULTS["packages"], key=str.casefold)
     elif args.config:
         # packages defined in the config file; it may be the same as DEFAULTS,
         # unless preinstalled by the packager or modified by the user
