@@ -400,7 +400,7 @@ def main():
 
     all_dirs = os.listdir(config["doc-dir"])
     packages = []
-    # print(all_dirs)
+    # filter doc dir names by internal package list of the list defined in config
     if args.internal:
         f_list = DEFAULTS["packages"]
         for _dir in all_dirs:
