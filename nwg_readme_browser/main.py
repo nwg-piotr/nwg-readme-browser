@@ -15,7 +15,7 @@ import argparse
 import json
 import os.path
 
-import markdown2 as markdown
+# import markdown2 as markdown
 import sys
 
 import gi
