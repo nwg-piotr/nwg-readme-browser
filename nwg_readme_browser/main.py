@@ -424,6 +424,7 @@ def main():
             readme_package_names.append(name)
 
     print(readme_package_names)
+    sys.exit(0)
 
     # Program window
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
