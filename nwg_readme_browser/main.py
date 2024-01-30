@@ -15,7 +15,7 @@ import argparse
 import json
 import os.path
 
-# import markdown2 as markdown
+import markdown2 as markdown
 import sys
 
 import gi
@@ -424,7 +424,6 @@ def main():
             readme_package_names.append(name)
 
     print(readme_package_names)
-    sys.exit(0)
 
     # Program window
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
