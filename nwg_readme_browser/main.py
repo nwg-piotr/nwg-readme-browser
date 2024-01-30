@@ -400,7 +400,7 @@ def main():
 
     all_dirs = os.listdir(config["doc-dir"])
     packages = []
-    print(all_dirs)
+    # print(all_dirs)
     if args.internal:
         f_list = DEFAULTS["packages"]
         for _dir in all_dirs:
@@ -423,7 +423,7 @@ def main():
         if readme_path(name):
             readme_package_names.append(name)
 
-    print(readme_package_names)
+    # print(readme_package_names)
 
     # Program window
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
