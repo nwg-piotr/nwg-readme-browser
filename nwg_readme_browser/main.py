@@ -342,33 +342,33 @@ def render_html(content):
     webview.load_html(content, 'file:///')
 
 
-# Supported file names & extensions supported in this precedence
+# Supported file names & supported extensions (in this order)
 def readme_path(name):
     if isinstance(name, str) and name:
-        if os.path.isfile(f"/usr/share/doc/{name}/README.md"):
-            return f"/usr/share/doc/{name}/README.md"
-        if os.path.isfile(f"/usr/share/doc/{name}/readme.md"):
-            return f"/usr/share/doc/{name}/readme.md"
+        if os.path.isfile(f"{config['doc-dir']}/{name}/README.md"):
+            return f"{config['doc-dir']}/{name}/README.md"
+        if os.path.isfile(f"{config['doc-dir']}/{name}/readme.md"):
+            return f"{config['doc-dir']}/{name}/readme.md"
 
-        elif os.path.isfile(f"/usr/share/doc/{name}/README.rst"):
-            return f"/usr/share/doc/{name}/README.rst"
-        elif os.path.isfile(f"/usr/share/doc/{name}/readme.rst"):
-            return f"/usr/share/doc/{name}/readme.rst"
+        elif os.path.isfile(f"{config['doc-dir']}/{name}/README.rst"):
+            return f"{config['doc-dir']}/{name}/README.rst"
+        elif os.path.isfile(f"{config['doc-dir']}/{name}/readme.rst"):
+            return f"{config['doc-dir']}/{name}/readme.rst"
 
-        elif os.path.isfile(f"/usr/share/doc/{name}/README.html"):
-            return f"/usr/share/doc/{name}/README.html"
-        elif os.path.isfile(f"/usr/share/doc/{name}/readme.html"):
-            return f"/usr/share/doc/{name}/readme.html"
+        elif os.path.isfile(f"{config['doc-dir']}/{name}/README.html"):
+            return f"{config['doc-dir']}/{name}/README.html"
+        elif os.path.isfile(f"{config['doc-dir']}/{name}/readme.html"):
+            return f"{config['doc-dir']}/{name}/readme.html"
 
-        elif os.path.isfile(f"/usr/share/doc/{name}/README"):
-            return f"/usr/share/doc/{name}/README"
-        elif os.path.isfile(f"/usr/share/doc/{name}/readme"):
-            return f"/usr/share/doc/{name}/readme"
+        elif os.path.isfile(f"{config['doc-dir']}/{name}/README"):
+            return f"{config['doc-dir']}/{name}/README"
+        elif os.path.isfile(f"{config['doc-dir']}/{name}/readme"):
+            return f"{config['doc-dir']}/{name}/readme"
 
-        elif os.path.isfile(f"/usr/share/doc/{name}/README.txt"):
-            return f"/usr/share/doc/{name}/README.txt"
-        elif os.path.isfile(f"/usr/share/doc/{name}/readme.txt"):
-            return f"/usr/share/doc/{name}/readme.txt"
+        elif os.path.isfile(f"{config['doc-dir']}/{name}/README.txt"):
+            return f"{config['doc-dir']}/{name}/README.txt"
+        elif os.path.isfile(f"{config['doc-dir']}/{name}/readme.txt"):
+            return f"{config['doc-dir']}/{name}/readme.txt"
 
     return ""
 
@@ -377,6 +377,14 @@ def readme_path(name):
 def update_status_label():
     parts = last_file_path.split("/")
     status_label.set_markup(f'<tt>{"/".join(parts[:-2])}/</tt><b>{parts[-2]}</b><tt>/{parts[-1]}</tt>')
+
+
+def fits_filter(name, filter_list):
+    for item in filter_list:
+        if name.startswith(item):
+            return True
+
+    return False
 
 
 def main():
@@ -397,19 +405,23 @@ def main():
     global last_file_path, home_path
     last_file_path = home_path = home_file()
 
-    # Which packages to list
+    all_dirs = os.listdir(config["doc-dir"])
+    packages = []
+    print(all_dirs)
     if args.internal:
-        # packages defined in the program DEFAULTS dictionary
-        packages = sorted(DEFAULTS["packages"], key=str.casefold)
+        f_list = DEFAULTS["packages"]
+        for _dir in all_dirs:
+            if fits_filter(_dir, f_list):
+                packages.append(_dir)
     elif args.config:
-        # packages defined in the config file; it may be the same as DEFAULTS,
-        # unless preinstalled by the packager or modified by the user
-        packages = config["packages"]
+        f_list = config["packages"]
+        for _dir in all_dirs:
+            if fits_filter(_dir, f_list):
+                packages.append(_dir)
     else:
-        # all packages found in DEFAULTS["doc-dir"] ('/usr/share/doc' by default)
-        folders = os.listdir("/usr/share/doc")
-        # sort case-insensitive
-        packages = sorted(folders, key=str.casefold)
+        packages = all_dirs
+
+    packages = sorted(packages, key=str.casefold)
 
     # verify which README.md files actually exist
     global readme_package_names
@@ -417,6 +429,8 @@ def main():
     for name in packages:
         if readme_path(name):
             readme_package_names.append(name)
+
+    print(readme_package_names)
 
     # Program window
     win = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
