@@ -34,6 +34,8 @@ options:
 
 ## Installation
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/nwg-readme-browser.svg)](https://repology.org/project/nwg-readme-browser/versions)
+
 Clone the [repository](https://github.com/nwg-piotr/nwg-readme-browser) and run the `install.sh` script.
 
 ## Configuration
