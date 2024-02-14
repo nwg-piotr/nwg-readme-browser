@@ -144,7 +144,7 @@ def handle_keyboard(win, event):
                 search_entry.set_text("")
             else:
                 win.destroy()
-        elif event.keyval == Gdk.KEY_F5 and not webview.get_uri().startswith("file:"):
+        elif event.keyval == Gdk.KEY_F5 and webview.get_uri() and webview.get_uri().startswith("http"):
             if event.state & Gdk.ModifierType.CONTROL_MASK:
                 webview.reload_bypass_cache()
             else:
