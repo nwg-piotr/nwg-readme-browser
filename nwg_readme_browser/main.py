@@ -138,11 +138,17 @@ def go_home(*args):
 # GUI controls
 # on Esc clear search entry if not empty, else terminate
 def handle_keyboard(win, event):
-    if event.type == Gdk.EventType.KEY_RELEASE and event.keyval == Gdk.KEY_Escape:
-        if search_entry.get_text():
-            search_entry.set_text("")
-        else:
-            win.destroy()
+    if event.type == Gdk.EventType.KEY_RELEASE:
+        if event.keyval == Gdk.KEY_Escape:
+            if search_entry.get_text():
+                search_entry.set_text("")
+            else:
+                win.destroy()
+        elif event.keyval == Gdk.KEY_F5 and not webview.get_uri().startswith("file:"):
+            if event.state & Gdk.ModifierType.CONTROL_MASK:
+                webview.reload_bypass_cache()
+            else:
+                webview.reload()
 
 
 # on toolbar buttons
