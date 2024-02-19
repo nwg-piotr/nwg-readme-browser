@@ -149,6 +149,10 @@ def handle_keyboard(win, event):
                 webview.reload_bypass_cache()
             else:
                 webview.reload()
+        elif event.keyval == Gdk.KEY_minus or event.keyval == Gdk.KEY_underscore and event.state & Gdk.ModifierType.CONTROL_MASK:
+            on_zoom_btn(None, action="out")
+        elif event.keyval == Gdk.KEY_equal or event.keyval == Gdk.KEY_plus and event.state & Gdk.ModifierType.CONTROL_MASK:
+            on_zoom_btn(None, action="in")
 
 
 # on toolbar buttons
