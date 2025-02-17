@@ -87,6 +87,7 @@ DEFAULTS = {
         "autotiling",
         "gopsuinfo",
         "nwg-hello",
+        "typobuster",
         "sddm-sugar-candy-nwg",
         "swaync",
         "gtklock",
