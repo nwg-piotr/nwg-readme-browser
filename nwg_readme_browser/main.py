@@ -2,12 +2,11 @@
 
 """
 nwg-shell README.md browser
-Copyright (c) 2024 Piotr Miller
+Copyright (c) 2024-2025 Piotr Miller
 e-mail: nwg.piotr@gmail.com
 Project: https://github.com/nwg-piotr/nwg-shell
 Repository: https://github.com/nwg-piotr/nwg-readme-browser
 License: MIT
-Dependencies: python-markdown2, python-docutils, webkit2gtk
 Supported formats: .md, .rst, html, plain text
 Unsupported formats: .pdf
 """
