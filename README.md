@@ -38,6 +38,19 @@ options:
 
 Clone the [repository](https://github.com/nwg-piotr/nwg-readme-browser) and run the `install.sh` script.
 
+### Dependencies
+
+- gtk3
+- python
+- python-docutils
+- python-gobject
+- python-markdown2
+- webkit2gtk
+- python-build (make)
+- python-installer (make)
+- python-wheel (make)
+- python-setuptools (make)
+
 ## Configuration
 
 The config file is placed in `~/.config/nwg-readme-browser/config.json` (unless you set the `$XDG_CONFIG_HOME` variable
