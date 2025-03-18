@@ -9,7 +9,7 @@ def read(f_name):
 
 setup(
     name='nwg-readme-browser',
-    version='0.1.6',
+    version='0.1.7',
     description='nwg-shell README browser',
     packages=find_packages(),
     include_package_data=True,
