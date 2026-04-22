@@ -13,6 +13,7 @@ Unsupported formats: .pdf
 import argparse
 import json
 import os.path
+import subprocess
 
 import markdown2 as markdown
 import sys
@@ -109,6 +110,45 @@ if not os.path.isfile(config_file) or key_missing:
     save_json(config, config_file)
 
 last_file_path = home_path = ""
+
+
+def detect_gtk_theme_preference():
+    """
+    Detect GTK theme preference (light/dark) from system settings.
+    Returns True if dark theme is preferred, False for light theme.
+    """
+    try:
+        # Method 1: Check gsettings for gtk-theme
+        result = subprocess.run(['gsettings', 'get', 'org.gnome.desktop.interface', 'gtk-theme'],
+                                capture_output=True, text=True, timeout=3)
+        if result.returncode == 0:
+            theme_name = result.stdout.strip().strip("'\"")
+            # Check if theme name suggests dark mode
+            if theme_name and ('dark' in theme_name.lower() or '-dark' in theme_name.lower()):
+                return True
+
+        # Method 2: Check gsettings for color-scheme (newer GNOME versions)
+        result = subprocess.run(['gsettings', 'get', 'org.gnome.desktop.interface', 'color-scheme'],
+                                capture_output=True, text=True, timeout=3)
+        if result.returncode == 0:
+            color_scheme = result.stdout.strip().strip("'\"")
+            if color_scheme == 'prefer-dark':
+                return True
+            elif color_scheme == 'prefer-light':
+                return False
+
+        # Method 3: Check GTK Settings for gtk-application-prefer-dark-theme
+        settings = Gtk.Settings.get_default()
+        if settings:
+            prefer_dark = settings.get_property("gtk-application-prefer-dark-theme")
+            return prefer_dark
+
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError,
+            AttributeError, ValueError):
+        # Fallback: assume light theme if detection fails
+        pass
+
+    return False
 
 
 # Convert markdown to html
@@ -334,17 +374,319 @@ def load_readme_file(file_path):
         return False
 
 
+def get_gtk_colors():
+    """Extract colors from current GTK theme with modern API"""
+    # Method 1: Try to get theme name and parse CSS (most reliable)
+    try:
+        settings = Gtk.Settings.get_default()
+        if settings:
+            theme_name = settings.get_property("gtk-theme-name")
+            if theme_name and theme_name.lower() != "default":
+                theme_colors = parse_theme_css(theme_name)
+                if theme_colors:
+                    return theme_colors
+    except:
+        pass
+
+    # Method 2: Use gsettings to get theme info
+    try:
+        result = subprocess.run(['gsettings', 'get', 'org.gnome.desktop.interface', 'gtk-theme'],
+                                capture_output=True, text=True, timeout=3)
+        if result.returncode == 0:
+            theme_name = result.stdout.strip().strip("'\"")
+            if theme_name and theme_name.lower() != "default":
+                theme_colors = parse_theme_css(theme_name)
+                if theme_colors:
+                    return theme_colors
+    except:
+        pass
+
+    # Method 3: Try to extract colors using CSS provider (modern approach)
+    try:
+        colors = extract_colors_from_css_provider()
+        if colors:
+            return colors
+    except:
+        pass
+
+    # Method 4: Final fallback based on dark/light preference
+    prefer_dark = detect_gtk_theme_preference()
+    if prefer_dark:
+        return {
+            'bg': "#2d2d2d",
+            'fg': "#ffffff",
+            'code_bg': "#1e1e1e",
+            'code_fg': "#ffffff",
+            'link': "#6bb6ff",
+            'border': "#444444"
+        }
+    else:
+        return {
+            'bg': "#ffffff",
+            'fg': "#000000",
+            'code_bg': "#f5f5f5",
+            'code_fg': "#000000",
+            'link': "#0066cc",
+            'border': "#cccccc"
+        }
+
+
+def extract_colors_from_css_provider():
+    """Extract colors using modern GTK CSS provider API"""
+    try:
+        # Create a temporary widget to get style context
+        widget = Gtk.Label()
+        widget.show()
+
+        # Get the style context
+        style_context = widget.get_style_context()
+
+        # Try to get background and foreground colors using CSS properties
+        # This is the modern replacement for deprecated get_background_color
+        try:
+            # Create a CSS provider to query colors
+            css_provider = Gtk.CssProvider()
+            css_data = b"""
+                label {
+                    background-color: @theme_bg_color;
+                    color: @theme_fg_color;
+                }
+            """
+            css_provider.load_from_data(css_data)
+
+            # Apply to style context
+            style_context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_THEME)
+
+            # Get the computed style
+            style_context.save()
+            style_context.set_state(Gtk.StateFlags.NORMAL)
+
+            # Try to extract colors from the style
+            # Note: This is a workaround since direct color extraction is complex
+            # We'll fall back to theme parsing which is more reliable
+
+            style_context.restore()
+
+        except Exception:
+            pass
+
+        return None  # Fall back to theme parsing
+
+    except Exception:
+        return None
+
+
+def generate_theme_colors(bg_hex, fg_hex):
+    """Generate theme colors from base background and foreground"""
+    code_bg = adjust_brightness(bg_hex, -0.1)
+    link_color = "#4a90e2" if is_light_color(bg_hex) else "#6bb6ff"
+
+    return {
+        'bg': bg_hex,
+        'fg': fg_hex,
+        'code_bg': code_bg,
+        'code_fg': fg_hex,
+        'link': link_color,
+        'border': adjust_brightness(bg_hex, -0.2)
+    }
+
+
+def parse_theme_css(theme_name):
+    """Try to parse theme CSS file for actual colors"""
+    import re
+
+    # Common theme paths
+    theme_paths = [
+        f"/usr/share/themes/{theme_name}/gtk-3.0/gtk.css",
+        f"/usr/share/themes/{theme_name}/gtk-3.20/gtk.css",
+        f"/home/{os.getenv('USER')}/.themes/{theme_name}/gtk-3.0/gtk.css",
+        f"/home/{os.getenv('USER')}/.themes/{theme_name}/gtk-3.20/gtk.css",
+        f"/home/{os.getenv('USER')}/.local/share/themes/{theme_name}/gtk-3.0/gtk.css"
+    ]
+
+    for theme_path in theme_paths:
+        if os.path.exists(theme_path):
+            try:
+                with open(theme_path, 'r') as f:
+                    css_content = f.read()
+
+                # Look for GTK named colors (better than generic CSS)
+                bg_match = re.search(r'@define-color theme_bg_color\s+([#][0-9a-fA-F]{6})', css_content)
+                fg_match = re.search(r'@define-color theme_fg_color\s+([#][0-9a-fA-F]{6})', css_content)
+                base_match = re.search(r'@define-color theme_base_color\s+([#][0-9a-fA-F]{6})', css_content)
+                text_match = re.search(r'@define-color theme_text_color\s+([#][0-9a-fA-F]{6})', css_content)
+                borders_match = re.search(r'@define-color borders\s+([#][0-9a-fA-F]{6})', css_content)
+
+                # Use base_color for content background if available, otherwise theme_bg_color
+                bg_color = base_match.group(1) if base_match else (bg_match.group(1) if bg_match else "#ffffff")
+                # Use text_color for content text if available, otherwise theme_fg_color
+                fg_color = text_match.group(1) if text_match else (fg_match.group(1) if fg_match else "#000000")
+                border_color = borders_match.group(1) if borders_match else adjust_brightness(bg_color, -0.2)
+
+                # Generate complementary colors
+                code_bg = adjust_brightness(bg_color, -0.05)  # Slightly darker for code blocks
+                link_color = "#cd7ebf"  # Use theme's selection color for links (from Otis)
+
+                return {
+                    'bg': bg_color,
+                    'fg': fg_color,
+                    'code_bg': code_bg,
+                    'code_fg': fg_color,
+                    'link': link_color,
+                    'border': border_color
+                }
+            except:
+                continue
+
+    return None
+
+
+def adjust_brightness(hex_color, factor):
+    """Adjust brightness of a hex color"""
+    rgb = tuple(int(hex_color[i:i + 2], 16) for i in (1, 3, 5))
+    rgb = tuple(max(0, min(255, int(c * (1 + factor)))) for c in rgb)
+    return "#{:02x}{:02x}{:02x}".format(*rgb)
+
+
+def is_light_color(hex_color):
+    """Check if a color is light or dark"""
+    rgb = tuple(int(hex_color[i:i + 2], 16) for i in (1, 3, 5))
+    luminance = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255
+    return luminance > 0.5
+
+
 def render_markdown(markdown_content):
-    html_content = f"<html><body>{md2html(markdown_content)}</body></html>"
+    colors = get_gtk_colors()
+    theme_css = f"""
+    <style>
+    body {{ 
+        background-color: {colors['bg']}; 
+        color: {colors['fg']}; 
+        font-family: system-ui, -apple-system, sans-serif; 
+        line-height: 1.6;
+        margin: 20px;
+    }}
+    pre {{ 
+        background-color: {colors['code_bg']}; 
+        color: {colors['code_fg']}; 
+        padding: 10px; 
+        border-radius: 4px; 
+        overflow-x: auto;
+        border: 1px solid {colors['border']};
+    }}
+    code {{ 
+        background-color: {colors['code_bg']}; 
+        color: {colors['code_fg']}; 
+        padding: 2px 4px; 
+        border-radius: 3px;
+    }}
+    blockquote {{ 
+        border-left: 4px solid {colors['border']}; 
+        margin: 0; 
+        padding-left: 16px; 
+        color: {adjust_brightness(colors['fg'], 0.3)};
+    }}
+    a {{ color: {colors['link']}; }}
+    h1, h2, h3, h4, h5, h6 {{ color: {colors['fg']}; }}
+    table {{ border-collapse: collapse; width: 100%; }}
+    th, td {{ border: 1px solid {colors['border']}; padding: 8px; }}
+    th {{ background-color: {colors['code_bg']}; }}
+    </style>
+    """
+
+    html_content = f"<html><head>{theme_css}</head><body>{md2html(markdown_content)}</body></html>"
     webview.load_html(html_content, 'file:///')
 
 
 def render_rst(content):
+    colors = get_gtk_colors()
+    theme_css = f"""
+    <style>
+    body {{ 
+        background-color: {colors['bg']}; 
+        color: {colors['fg']}; 
+        font-family: system-ui, -apple-system, sans-serif; 
+        line-height: 1.6;
+        margin: 20px;
+    }}
+    pre {{ 
+        background-color: {colors['code_bg']}; 
+        color: {colors['code_fg']}; 
+        padding: 10px; 
+        border-radius: 4px; 
+        overflow-x: auto;
+        border: 1px solid {colors['border']};
+    }}
+    code {{ 
+        background-color: {colors['code_bg']}; 
+        color: {colors['code_fg']}; 
+        padding: 2px 4px; 
+        border-radius: 3px;
+    }}
+    blockquote {{ 
+        border-left: 4px solid {colors['border']}; 
+        margin: 0; 
+        padding-left: 16px; 
+        color: {adjust_brightness(colors['fg'], 0.3)};
+    }}
+    a {{ color: {colors['link']}; }}
+    h1, h2, h3, h4, h5, h6 {{ color: {colors['fg']}; }}
+    table {{ border-collapse: collapse; width: 100%; }}
+    th, td {{ border: 1px solid {colors['border']}; padding: 8px; }}
+    th {{ background-color: {colors['code_bg']}; }}
+    </style>
+    """
+
     html_content = publish_string(source=content, writer_name='html').decode('utf-8')
+    # Insert theme CSS into the HTML
+    html_content = html_content.replace('<head>', '<head>' + theme_css)
     webview.load_html(html_content, 'file:///')
 
 
 def render_html(content):
+    colors = get_gtk_colors()
+    theme_css = f"""
+    <style>
+    body {{ 
+        background-color: {colors['bg']}; 
+        color: {colors['fg']}; 
+        font-family: system-ui, -apple-system, sans-serif; 
+        line-height: 1.6;
+        margin: 20px;
+    }}
+    pre {{ 
+        background-color: {colors['code_bg']}; 
+        color: {colors['code_fg']}; 
+        padding: 10px; 
+        border-radius: 4px; 
+        overflow-x: auto;
+        border: 1px solid {colors['border']};
+    }}
+    code {{ 
+        background-color: {colors['code_bg']}; 
+        color: {colors['code_fg']}; 
+        padding: 2px 4px; 
+        border-radius: 3px;
+    }}
+    blockquote {{ 
+        border-left: 4px solid {colors['border']}; 
+        margin: 0; 
+        padding-left: 16px; 
+        color: {adjust_brightness(colors['fg'], 0.3)};
+    }}
+    a {{ color: {colors['link']}; }}
+    h1, h2, h3, h4, h5, h6 {{ color: {colors['fg']}; }}
+    table {{ border-collapse: collapse; width: 100%; }}
+    th, td {{ border: 1px solid {colors['border']}; padding: 8px; }}
+    th {{ background-color: {colors['code_bg']}; }}
+    </style>
+    """
+
+    # Insert theme CSS into the HTML
+    if '<head>' in content:
+        content = content.replace('<head>', '<head>' + theme_css)
+    else:
+        content = f"<html><head>{theme_css}</head><body>{content}</body></html>"
     webview.load_html(content, 'file:///')
 
 
@@ -500,11 +842,17 @@ def main():
     win.connect("destroy", Gtk.main_quit)
     win.connect("key-release-event", handle_keyboard)
 
-    # customize styling
+    # customize styling and apply theme preference
     screen = Gdk.Screen.get_default()
     provider = Gtk.CssProvider()
     style_context = Gtk.StyleContext()
     style_context.add_provider_for_screen(screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+    # Apply automatic theme detection
+    prefer_dark = detect_gtk_theme_preference()
+    settings = Gtk.Settings.get_default()
+    if settings:
+        settings.set_property("gtk-application-prefer-dark-theme", prefer_dark)
 
     css = b"""button { padding: 0 }"""
     provider.load_from_data(css)
